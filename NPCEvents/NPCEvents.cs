@@ -1,4 +1,13 @@
-﻿using System;
+﻿// TO DO
+
+// - make a Spawn BradleyCrashSite Command
+// - spawns randomly on road
+// - kills itself
+// - announces crash in chat
+// - spawns scientists a certain value away from the current position of Bradley
+
+using ConVar;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,14 +22,26 @@ namespace Oxide.Plugins
 
     class NPC_Events : RustPlugin
     {
-        private float respawnDelay = 3600f;
+        private float respawnDelay = 3600;
+
+        private DateTime wipeTime;
+        private readonly TimeSpan onehour = TimeSpan.FromHours(1);
+        private void Init()
+        {
+            wipeTime = DateTime.UtcNow;
+        }
+
         private void SpawningBradleyAtLocation(Vector3 position)
         {
             BaseEntity bradley = GameManager.server.CreateEntity("assets/prefabs/npc/military/barricade/barricade.prefab", position, Quaternion.identity);
 
-            if (bradley != null)
+            DateTime currentTime = DateTime.UtcNow;
+            TimeSpan timeElapsed = currentTime - wipeTime;
+
+            if (timeElapsed < onehour && bradley != null)
             {
                 bradley.Spawn();
+                return;
             }
         }
     }
